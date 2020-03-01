@@ -147,7 +147,7 @@ function get_status( $gfacID, $us3_db )
   if ( ! $result || mysqli_num_rows( $result ) == 0 )
     return false;
 
-  $status = mysqli_fetch_array( $result, MYSQL_ASSOC );
+  $status = mysqli_fetch_array( $result, MYSQLI_ASSOC );
 
   // Make a few helpful changes
   $triple = '';

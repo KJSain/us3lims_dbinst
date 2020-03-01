@@ -71,7 +71,7 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
    global $gDB;
    global $home;
 
-   $resource = mysql_connect( $dbhost, $user, $passwd );
+   $resource = mysqli_connect( $dbhost, $user, $passwd );
 
    if ( ! $resource )
    {
@@ -79,9 +79,9 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
       return;
    }
 
-   if ( ! mysql_select_db( $db, $resource ) )
+   if ( ! mysqli_select_db( $resource, $db ) )
    {
-     write_log( "$me: Could not select DB $db - " . mysql_error( $resource ) );
+     write_log( "$me: Could not select DB $db - " . mysqli_error( $resource ) );
      return;
    }
 
@@ -90,7 +90,7 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
             "ORDER BY HPCAnalysisResultID DESC "                 .
             "LIMIT 1";
 
-   $result = mysql_query( $query, $resource );
+   $result = mysqli_query( $resource, $query );
    
    if ( ! $result )
    {
@@ -98,7 +98,7 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
      return;
    }
 
-   list( $resultID, $gfacID ) = mysql_fetch_row( $result );
+   list( $resultID, $gfacID ) = mysqli_fetch_row( $result );
 
    $query = "UPDATE HPCAnalysisResult SET ";
 
@@ -127,15 +127,15 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
          break;
    }
 
-   $query .= "lastMessage='" . mysql_real_escape_string( $message ) . "'" .
+   $query .= "lastMessage='" . mysqli_real_escape_string( $message ) . "'" .
              "WHERE HPCAnalysisResultID=$resultID";
 
-   mysql_query( $query, $resource );
-   mysql_close( $resource );
+   mysqli_query( $resource, $query );
+   mysqli_close( $resource );
 
    if ( $set_global )
    {
-      $resource = mysql_connect( $dbhost, $guser, $gpasswd );
+      $resource = mysqli_connect( $dbhost, $guser, $gpasswd );
 
       if ( ! $resource )
       {
@@ -143,9 +143,9 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
          return;
       }
 
-      if ( ! mysql_select_db( $gDB, $resource ) )
+      if ( ! mysqli_select_db( $resource, $gDB ) )
       {
-        write_log( "$me: Could not select DB $gDB - " . mysql_error( $resource ) );
+        write_log( "$me: Could not select DB $gDB - " . mysqli_error( $resource ) );
         return;
       }
 
@@ -153,8 +153,8 @@ function update_db( $dbhost, $db, $action, $message, $requestID )
                "WHERE gfacID='$gfacID'";
 
 
-      mysql_query( $query, $resource );
-      mysql_close( $resource );
+      mysqli_query( $resource, $query );
+      mysqli_close( $resource );
    }
 
    // There can be more than one instance of cleanup.php running at one time

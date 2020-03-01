@@ -90,8 +90,8 @@ function update( $cluster, $queued, $status, $running )
    global $gDB;
    global $me;
 
-   $gfac_link = mysql_connect( $dbhost, $guser, $gpasswd );
-   $result = mysql_select_db( $gDB, $gfac_link );
+   $gfac_link = mysqli_connect( $dbhost, $guser, $gpasswd );
+   $result = mysqli_select_db( $gfac_link, $gDB );
 
    if ( ! $result )
    {
@@ -101,16 +101,16 @@ function update( $cluster, $queued, $status, $running )
    }
       
    $query = "SELECT * FROM cluster_status WHERE cluster='$cluster'";
-   $result = mysql_query( $query, $gfac_link );
+   $result = mysqli_query( $gfac_link, $query );
 
    if ( ! $result )
    {
-      write_log( "$me: Query failed $query - " .  mysql_error( $gfac_link ) );
-      echo "$me: Query failed $query - " .  mysql_error( $gfac_link ) . "\n";
+      write_log( "$me: Query failed $query - " .  mysqli_error( $gfac_link ) );
+      echo "$me: Query failed $query - " .  mysqli_error( $gfac_link ) . "\n";
       exit();
    }
 
-   $rows = mysql_num_rows( $result );
+   $rows = mysqli_num_rows( $result );
 
    if ( $rows == 0 )  // INSERT
    {
@@ -129,12 +129,12 @@ function update( $cluster, $queued, $status, $running )
                "WHERE cluster='$cluster'";
    }
 
-   $result = mysql_query( $query, $gfac_link );
+   $result = mysqli_query( $gfac_link, $query );
 
    if ( ! $result )
    {
-      write_log( "$me: Query failed $query - " .  mysql_error( $gfac_link ) );
-      echo "$me: Query failed $query - " .  mysql_error( $gfac_link ) . "\n";
+      write_log( "$me: Query failed $query - " .  mysqli_error( $gfac_link ) );
+      echo "$me: Query failed $query - " .  mysqli_error( $gfac_link ) . "\n";
    }
 }
 

@@ -167,7 +167,7 @@ function do_update( $link )
   $result = mysqli_query( $link, $query )
             or die("Query failed : $query<br />\n" . mysqli_error($link));
 
-  $row    = mysqli_fetch_array( $result, MYSQL_ASSOC );
+  $row    = mysqli_fetch_array( $result, MYSQLI_ASSOC );
 
   // Create local variables
   foreach ($row as $key => $value)
@@ -354,7 +354,7 @@ function display_record( $link )
   $result = mysqli_query($link,$query)
             or die("Query failed : $query<br />\n" . mysqli_error($link));
 
-  $row    = mysqli_fetch_array($result, MYSQL_ASSOC);
+  $row    = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
   // Create local variables; make sure IE displays empty cells properly
   foreach ($row as $key => $value)

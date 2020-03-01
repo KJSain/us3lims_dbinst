@@ -7,9 +7,9 @@ $message = "";
 $updateTime = 0;
 
 // Get data from global GFAC DB 
-$gfac_link = mysql_connect( $dbhost, $guser, $gpasswd );
+$gfac_link = mysqli_connect( $dbhost, $guser, $gpasswd );
 
-$result = mysql_select_db( $gDB, $gfac_link );
+$result = mysqil_select_db( $gfac_link, $gDB );
 
 if ( ! $result )
 {
@@ -20,23 +20,23 @@ if ( ! $result )
    
 $query = "SELECT gfacID, us3_db, cluster, status, queue_msg, " .
                 "UNIX_TIMESTAMP(time), time from analysis";
-$result = mysql_query( $query, $gfac_link );
+$result = mysqli_query( $gfac_link, $query );
 
 if ( ! $result )
 {
-   write_log( "$me: Query failed $query - " .  mysql_error( $gfac_link ) );
-   mail_to_admin( "fail", "Query failed $query\n" .  mysql_error( $gfac_link ) );
+   write_log( "$me: Query failed $query - " .  mysqli_error( $gfac_link ) );
+   mail_to_admin( "fail", "Query failed $query\n" .  mysqli_error( $gfac_link ) );
    exit();
 }
 
-$rows = mysql_num_rows( $result );
+$rows = mysqli_num_rows( $result );
 
 if ( $rows == 0 ) exit();  // Nothing to do
 
 for ( $i = 0; $i < $rows; $i++ )
 {
    list( $gfacID, $us3_db, $cluster, $status, $queue_msg, $time, $submittime ) 
-            = mysql_fetch_array( $result );
+            = mysqli_fetch_array( $result );
 
    // Don't worry about this entry if it's already been logged
    if ( substr( $queue_msg, 0, 7 ) == "Handled" ) continue;
@@ -48,10 +48,10 @@ for ( $i = 0; $i < $rows; $i++ )
       mail_to_admin( "fail", "GFAC DB is NULL\n$gfacID" );
 
       $query2 = "UPDATE analysis SET queue_msg='Handled' WHERE gfacID='$gfacID'";
-      $result2 = mysql_query( $query2, $gfac_link );
+      $result2 = mysqli_query( $gfac_link, $query2 );
 
       if ( ! $result2 )
-         write_log( "$me: Query failed $query2 - " .  mysql_error( $gfac_link ) );
+         write_log( "$me: Query failed $query2 - " .  mysqli_error( $gfac_link ) );
 
       continue;
    }
@@ -96,10 +96,10 @@ function submitted( $updatetime )
       write_log( "$me: Job idle too long - id: $gfacID" );
       mail_to_admin( "hang", "Job idle too long - id: $gfacID" );
       $query = "UPDATE analysis SET queue_msg='Handled' WHERE gfacID='$gfacID'";
-      $result = mysql_query( $query, $gfac_link );
+      $result = mysqli_query( $gfac_link, $query );
 
       if ( ! $result )
-         write_log( "$me: Query failed $query - " .  mysql_error( $gfac_link ) );
+         write_log( "$me: Query failed $query - " .  mysqli_error( $gfac_link ) );
   }
 }
 
@@ -179,16 +179,16 @@ function complete()
 
    sleep( 10 );
    $query  = "SELECT count(*) FROM analysis WHERE gfacID='$gfacID'";
-   $result = mysql_query( $query, $gfac_link );
+   $result = mysqli_query( $gfac_link, $query );
   
    if ( ! $result )
    {
-      write_log( "$me: Query failed $query - " .  mysql_error( $gfac_link ) );
-      mail_to_admin( "fail", "Query failed $query\n" .  mysql_error( $gfac_link ) );
+      write_log( "$me: Query failed $query - " .  mysqli_error( $gfac_link ) );
+      mail_to_admin( "fail", "Query failed $query\n" .  mysqli_error( $gfac_link ) );
       exit();
    }
 
-   list( $count ) = mysql_fetch_array( $result );
+   list( $count ) = mysqli_fetch_array( $result );
 
    if ( $count == 0 ) return;
 
@@ -227,7 +227,7 @@ function get_us3_data()
    global $us3_db;
    global $updateTime;
 
-   $us3_link = mysql_connect( $dbhost, $user, $passwd );
+   $us3_link = mysqli_connect( $dbhost, $user, $passwd );
 
    if ( ! $us3_link )
    {
@@ -237,7 +237,7 @@ function get_us3_data()
    }
 
 
-   $result = mysql_select_db( $us3_db, $us3_link );
+   $result = mysqli_select_db( $us3_link, $us3_db );
 
    if ( ! $result )
    {
@@ -248,17 +248,17 @@ function get_us3_data()
 
    $query = "SELECT HPCAnalysisRequestID, UNIX_TIMESTAMP(updateTime) " .
             "FROM HPCAnalysisResult WHERE gfacID='$gfacID'";
-   $result = mysql_query( $query, $us3_link );
+   $result = mysqli_query( $us3_link, $query );
 
    if ( ! $result )
    {
-      write_log( "$me: Query failed $query - " .  mysql_error( $us3_link ) );
-      mail_to_admin( "fail", "Query failed $query\n" .  mysql_error( $us3_link ) );
+      write_log( "$me: Query failed $query - " .  mysqli_error( $us3_link ) );
+      mail_to_admin( "fail", "Query failed $query\n" .  mysqli_error( $us3_link ) );
       return 0;
    }
 
-   list( $requestID, $updateTime ) = mysql_fetch_array( $result );
-   mysql_close( $us3_link );
+   list( $requestID, $updateTime ) = mysqli_fetch_array( $result );
+   mysqli_close( $us3_link );
 
    return $requestID;
 }
